@@ -7,6 +7,7 @@
 import streamlit as st
 import pandas as pd
 from geopy.distance import geodesic
+from datetime import datetime
 
 st.set_page_config(page_title="GPS Validation Pickup", layout="wide")
 
@@ -133,12 +134,14 @@ if uploaded_file:
 
   
     csv = df_display.to_csv(index=False).encode('utf-8')
+    tanggal = datetime.now().strftime("%Y-%m-%d")
+    file_name = f"hasil_validasi_{tanggal}.csv"
 
     st.download_button(
-        label="⬇️ Download Hasil CSV",
-        data=csv,
-        file_name="hasil_validasi.csv",
-        mime="text/csv"
+    label="⬇️ Download Hasil CSV",
+    data=csv,
+    file_name=file_name,
+    mime="text/csv"
     )
 
 else:
