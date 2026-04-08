@@ -12,7 +12,7 @@ import pydeck as pdk
 
 st.set_page_config(page_title="GPS Validation Dashboard", layout="wide")
 
-st.title("📍 GPS Validation Dashboard (PRO)")
+st.title("📍 GPS Validation Dashboard")
 
 
 def split_longlat(val):
