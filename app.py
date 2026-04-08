@@ -134,8 +134,8 @@ if uploaded_file:
 
   
     csv = df_display.to_csv(index=False).encode('utf-8')
-    tanggal = datetime.now().strftime("%Y-%m-%d")
-    file_name = f"hasil_validasi_{tanggal}.csv"
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
+    file_name = f"hasil_validasi_{timestamp}.csv"
 
     st.download_button(
     label="⬇️ Download Hasil CSV",
