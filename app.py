@@ -125,11 +125,14 @@ if uploaded_file:
     if zone_filter != "ALL":
         df = df[df['ZONE'] == zone_filter]
 
+
+    df_display = df.drop(columns=['VALIDASI_LAT', 'VALIDASI_LON'], errors='ignore')
+
     
-    st.dataframe(df, use_container_width=True)
+    st.dataframe(df_display, use_container_width=True)
 
   
-    csv = df.to_csv(index=False).encode('utf-8')
+    csv = df_display.to_csv(index=False).encode('utf-8')
 
     st.download_button(
         label="⬇️ Download Hasil CSV",
