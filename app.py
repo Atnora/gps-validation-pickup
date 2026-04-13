@@ -95,6 +95,7 @@ if uploaded_file:
 
 
     df['DISTANCE_METER'] = df.apply(hitung_jarak, axis=1)
+    df['DISTANCE_KM'] = (df['DISTANCE_METER'] / 1000).round(2)
 
 
     df['STATUS_VALIDASI'] = df['DISTANCE_METER'].apply(
