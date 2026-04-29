@@ -117,12 +117,12 @@ if uploaded_file:
         df = df[df['ZONE'] == zone_filter]
 
     courier_filter = st.selectbox(
-        "Filter Courier (S01, S02, dll)",
-        ["ALL"] + sorted(df['PICKUP COURIER'].dropna().unique().tolist())
+        "Filter Status",
+        ["ALL"] + sorted(df['PICKUP STATUS'].dropna().unique().tolist())
     )
 
     if courier_filter != "ALL":
-        df = df[df['PICKUP COURIER'] == courier_filter]
+        df = df[df['PICKUP STATUS'] == courier_filter]
 
     # =========================
     # KPI
@@ -162,8 +162,7 @@ if uploaded_file:
     # MAP
     # =========================
 
-    st.subheader("🗺️ Peta Lokasi Pickup")
-
+    st.subheader("🗺️ Peta Lokasi Pickup Status")
     map_df = df[['PICKUP STATUS LATITUDE', 'PICKUP STATUS LONGITUDE']].dropna()
 
     map_df = map_df[
