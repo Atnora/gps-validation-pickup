@@ -128,19 +128,19 @@ if uploaded_file:
     # KPI
     # =========================
 
+    st.subheader("📊 KPI Summary")
+
     total = len(df)
-    valid = df['STATUS_VALIDASI'].sum()
+    valid = int(df['STATUS_VALIDASI'].sum())
     invalid = total - valid
     avg_km = df['DISTANCE_KM'].mean()
-
+    
     col1, col2, col3, col4 = st.columns(4)
-
+    
     col1.metric("Total Data", total)
-    col2.metric("Valid", valid)
-    col3.metric("Tidak Valid", invalid)
+    col2.metric("Valid (<=300m)", valid)
+    col3.metric("Tidak Valid (>300m)", invalid)
     col4.metric("Rata-rata Jarak (km)", round(avg_km, 2) if pd.notna(avg_km) else 0)
-
-    st.divider()
 
     # =========================
     # PIE CHART
