@@ -99,7 +99,7 @@ if uploaded_file:
     # INTERACTIVE CONTROL
     # =========================
 
-    threshold = st.slider("🎯 Batas Validasi (meter)", 100, 1000, 300)
+
 
     df['STATUS_VALIDASI'] = df['DISTANCE_METER'].apply(
         lambda x: True if pd.notna(x) and x <= threshold else False
@@ -115,7 +115,14 @@ if uploaded_file:
 
     if zone_filter != "ALL":
         df = df[df['ZONE'] == zone_filter]
+    courier_filter = st.selectbox(
+    "Filter Courier (S01, S02, dll)",
+    ["ALL"] + sorted(df['PICKUP COURIER'].dropna().unique().tolist())
+    )
 
+    if courier_filter != "ALL":
+    df = df[df['PICKUP COURIER'] == courier_filter]
+    
     # =========================
     # KPI
     # =========================
