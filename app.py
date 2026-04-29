@@ -26,7 +26,6 @@ def split_longlat(val):
         if abs(lat) > 90 and abs(lon) <= 90:
             lat, lon = lon, lat
 
-        # validasi range
         if abs(lat) > 90 or abs(lon) > 180:
             return None, None
 
@@ -96,18 +95,19 @@ if uploaded_file:
     df['DISTANCE_KM'] = (df['DISTANCE_METER'] / 1000).round(2)
 
     # =========================
-    # INTERACTIVE CONTROL
+    # VALIDASI FIX (<=300m)
     # =========================
 
-
-
     df['STATUS_VALIDASI'] = df['DISTANCE_METER'].apply(
-        lambda x: True if pd.notna(x) and x <= threshold else False
+        lambda x: True if pd.notna(x) and x <= 300 else False
     )
 
     df['ZONE'] = df['DISTANCE_METER'].apply(zoning)
 
-    # filter zone
+    # =========================
+    # FILTER
+    # =========================
+
     zone_filter = st.selectbox(
         "Filter Zone",
         ["ALL", "ZONE 1 (<=300m)", "ZONE 2 (300m - 1km)", "ZONE 3 (1km - 5km)", "ZONE 4 (>5km)"]
@@ -115,14 +115,15 @@ if uploaded_file:
 
     if zone_filter != "ALL":
         df = df[df['ZONE'] == zone_filter]
+
     courier_filter = st.selectbox(
-    "Filter Courier (S01, S02, dll)",
-    ["ALL"] + sorted(df['PICKUP COURIER'].dropna().unique().tolist())
+        "Filter Courier (S01, S02, dll)",
+        ["ALL"] + sorted(df['PICKUP COURIER'].dropna().unique().tolist())
     )
 
     if courier_filter != "ALL":
-    df = df[df['PICKUP COURIER'] == courier_filter]
-    
+        df = df[df['PICKUP COURIER'] == courier_filter]
+
     # =========================
     # KPI
     # =========================
@@ -142,7 +143,7 @@ if uploaded_file:
     st.divider()
 
     # =========================
-    # PIE CHART (PLOTLY)
+    # PIE CHART
     # =========================
 
     st.subheader("📊 Distribusi Zona")
@@ -165,7 +166,6 @@ if uploaded_file:
 
     map_df = df[['PICKUP STATUS LATITUDE', 'PICKUP STATUS LONGITUDE']].dropna()
 
-    # validasi koordinat
     map_df = map_df[
         (map_df['PICKUP STATUS LATITUDE'].between(-90, 90)) &
         (map_df['PICKUP STATUS LONGITUDE'].between(-180, 180))
