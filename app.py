@@ -5,7 +5,7 @@ import streamlit as st
 import pandas as pd
 from geopy.distance import geodesic
 from datetime import datetime
-import matplotlib.pyplot as plt
+import plotly.express as px
 
 st.set_page_config(page_title="GPS Validation Pickup", layout="wide")
 
@@ -86,7 +86,7 @@ if uploaded_file:
     df['PICKUP STATUS LATITUDE'] = pd.to_numeric(df['PICKUP STATUS LATITUDE'], errors='coerce')
     df['PICKUP STATUS LONGITUDE'] = pd.to_numeric(df['PICKUP STATUS LONGITUDE'], errors='coerce')
 
-    # split longlat validasi
+    # split longlat
     df[['VALIDASI_LAT', 'VALIDASI_LON']] = df['LONGLAT VALIDASI'].apply(
         lambda x: pd.Series(split_longlat(x))
     )
@@ -96,7 +96,7 @@ if uploaded_file:
     df['DISTANCE_KM'] = (df['DISTANCE_METER'] / 1000).round(2)
 
     # =========================
-    # INTERACTIVE FILTER
+    # INTERACTIVE CONTROL
     # =========================
 
     threshold = st.slider("🎯 Batas Validasi (meter)", 100, 1000, 300)
@@ -113,18 +113,8 @@ if uploaded_file:
         ["ALL", "ZONE 1 (<=300m)", "ZONE 2 (300m - 1km)", "ZONE 3 (1km - 5km)", "ZONE 4 (>5km)"]
     )
 
-    # filter courier
-    courier_filter = st.multiselect(
-        "Filter Courier",
-        options=df['PICKUP COURIER'].dropna().unique()
-    )
-
-    # apply filter
     if zone_filter != "ALL":
         df = df[df['ZONE'] == zone_filter]
-
-    if courier_filter:
-        df = df[df['PICKUP COURIER'].isin(courier_filter)]
 
     # =========================
     # KPI
@@ -145,18 +135,20 @@ if uploaded_file:
     st.divider()
 
     # =========================
-    # PIE CHART
+    # PIE CHART (PLOTLY)
     # =========================
 
     st.subheader("📊 Distribusi Zona")
 
-    zone_counts = df['ZONE'].value_counts()
+    zone_counts = df['ZONE'].value_counts().reset_index()
+    zone_counts.columns = ['Zone', 'Count']
 
-    fig, ax = plt.subplots()
-    ax.pie(zone_counts, labels=zone_counts.index, autopct='%1.1f%%')
-    ax.set_title("Distribusi Zona Pickup")
-
-    st.pyplot(fig)
+    if not zone_counts.empty:
+        fig = px.pie(zone_counts, names='Zone', values='Count',
+                     title='Distribusi Zona Pickup')
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.warning("Tidak ada data untuk ditampilkan")
 
     # =========================
     # MAP
@@ -165,9 +157,19 @@ if uploaded_file:
     st.subheader("🗺️ Peta Lokasi Pickup")
 
     map_df = df[['PICKUP STATUS LATITUDE', 'PICKUP STATUS LONGITUDE']].dropna()
+
+    # validasi koordinat
+    map_df = map_df[
+        (map_df['PICKUP STATUS LATITUDE'].between(-90, 90)) &
+        (map_df['PICKUP STATUS LONGITUDE'].between(-180, 180))
+    ]
+
     map_df.columns = ['lat', 'lon']
 
-    st.map(map_df)
+    if not map_df.empty:
+        st.map(map_df)
+    else:
+        st.warning("Data koordinat tidak tersedia / kosong setelah filter")
 
     # =========================
     # DATA TABLE
